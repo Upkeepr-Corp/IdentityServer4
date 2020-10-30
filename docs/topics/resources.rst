@@ -27,7 +27,7 @@ This is how you could define the openid scope in code::
         {
             new IdentityResource(
                 name: "openid",
-                claimTypes: new[] { "sub" },
+                userClaims: new[] { "sub" },
                 displayName: "Your user identifier")
         };
     }
@@ -52,7 +52,7 @@ The following example shows a custom identity resource called *profile* that rep
         {
             new IdentityResource(
                 name: "profile",
-                claimTypes: new[] { "name", "email", "website" },
+                userClaims: new[] { "name", "email", "website" },
                 displayName: "Your profile data")
         };
     }
@@ -233,14 +233,14 @@ In IdentityServer, the ``ApiResource`` class allows some additional organization
 
             // customer API specific scopes
             new ApiScope(name: "customer.read",    displayName: "Reads you customers information."),
-            new ApiScope(name: "customer.contact", displayName: "Allows contacting one of your customers.")
+            new ApiScope(name: "customer.contact", displayName: "Allows contacting one of your customers."),
 
             // shared scope
             new ApiScope(name: "manage", displayName: "Provides administrative access to invoice and customer data.")
         };
     }
 
-With ``ApiResource`` you can now create two logical APIs and their correponding scopes::
+With ``ApiResource`` you can now create two logical APIs and their corresponding scopes::
 
     public static readonly IEnumerable<ApiResource> GetApiResources()
     { 

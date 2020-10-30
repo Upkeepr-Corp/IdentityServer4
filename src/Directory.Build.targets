@@ -5,7 +5,7 @@
     <ExtensionsVersion>3.1.0</ExtensionsVersion>
     <EntityFrameworkVersion>3.1.0</EntityFrameworkVersion>
     
-    <IdentityServerVersion>4.0.3-*</IdentityServerVersion>
+    <IdentityServerVersion>4.1.2-*</IdentityServerVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,7 +22,7 @@
     <PackageReference Update="xunit.runner.visualstudio" Version="2.4.1" PrivateAssets="All" />
 
     <!--our stuff -->
-    <PackageReference Update="IdentityModel" Version="4.3.0" />
+    <PackageReference Update="IdentityModel" Version="4.4.0" />
 
     <PackageReference Update="IdentityServer4" Version="$(IdentityServerVersion)" />
     <PackageReference Update="IdentityServer4.AspNetIdentity" Version="$(IdentityServerVersion)" />
@@ -43,7 +43,7 @@
     <PackageReference Update="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="5.6.0" />
     <PackageReference Update="System.IdentityModel.Tokens.Jwt" Version="[5.6.0,6.0)" />
     <PackageReference Update="System.Security.Principal.Windows" Version="4.7.0" />
-    <PackageReference Update="AutoMapper" Version="[9.0.0,10.0)" />
+    <PackageReference Update="AutoMapper" Version="[10.0.0,11.0)" />
     
     <!--microsoft asp.net core -->
     <PackageReference Update="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="$(FrameworkVersion)" />

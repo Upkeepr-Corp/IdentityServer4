@@ -9,7 +9,7 @@ To see the full list, please go to `IdentityServer4 Quickstarts Overview <https:
 
 This first quickstart is the most basic scenario for protecting APIs using IdentityServer. 
 In this quickstart you define an API and a Client with which to access it. 
-The client will request an access token from the Identity Server using its client ID and secret will then use the token to gain access to the API.
+The client will request an access token from the Identity Server using its client ID and secret and then use the token to gain access to the API.
 
 Source Code
 ^^^^^^^^^^^
@@ -113,6 +113,7 @@ Loading the resource and client definitions happens in `Startup.cs <https://gith
     public void ConfigureServices(IServiceCollection services)
     {
         var builder = services.AddIdentityServer()
+            .AddDeveloperSigningCredential()        //This is for dev only scenarios when you don’t have a certificate to use.
             .AddInMemoryApiScopes(Config.ApiScopes)
             .AddInMemoryClients(Config.Clients);
 
@@ -124,7 +125,7 @@ The discovery document is a standard endpoint in identity servers.  The discover
 
 .. image:: images/1_discovery.png
 
-At first startup, IdentityServer will create a developer signing key for you, it's a file called ``tempkey.rsa``.
+At first startup, IdentityServer will create a developer signing key for you, it's a file called ``tempkey.jwk``.
 You don't have to check that file into your source control, it will be re-created if it is not present.
 
 Adding an API
@@ -134,7 +135,7 @@ Next, add an API to your solution.
 You can either use the ASP.NET Core Web API template from Visual Studio or use the .NET CLI to create the API project as we do here.
 Run from within the ``src`` folder the following command::
 
-    dotnet new web -n Api
+    dotnet new webapi -n Api
 
 Then add it to the solution by running the following commands::
 
@@ -164,7 +165,7 @@ This controller will be used later to test the authorization requirement, as wel
 
 Adding a Nuget Dependency
 -------------------------
-In order for the configuration step to work the nuget package dependency has to be added, run this command in the root directory.
+In order for the configuration step to work the nuget package dependency has to be added, run this command in the root directory::
 
     dotnet add .\\src\\api\\Api.csproj package Microsoft.AspNetCore.Authentication.JwtBearer
 
@@ -250,6 +251,7 @@ IdentityModel includes a client library to use with the discovery endpoint. This
         Console.WriteLine(disco.Error);
         return;
     }
+.. note:: If you get an error connecting it may be that you are running `https` and the development certificate for ``localhost`` is not trusted. You can run ``dotnet dev-certs https --trust`` in order to trust the development certificate. This only needs to be done once.
 
 Next you can use the information from the discovery document to request a token to IdentityServer to access ``api1``::
 
@@ -306,7 +308,7 @@ Authorization at the API
 Right now, the API accepts any access token issued by your identity server.
 
 In the following we will add code that allows checking for the presence of the scope in the access token that the client asked for (and got granted).
-For this we will use the ASP.NET Core authorization policy system. Add the following to the ``Configure`` method in ``Startup``::
+For this we will use the ASP.NET Core authorization policy system. Add the following to the ``ConfigureServices`` method in ``Startup``::
 
     services.AddAuthorization(options =>
     {

@@ -68,6 +68,14 @@ namespace IdentityServer4.Services
         protected string CheckSessionCookieDomain => Options.Authentication.CheckSessionCookieDomain;
 
         /// <summary>
+        /// Gets the SameSite mode of the check session cookie.
+        /// </summary>
+        /// <value>
+        /// The SameSite mode of the check session cookie.
+        /// </value>
+        protected SameSiteMode CheckSessionCookieSameSiteMode => Options.Authentication.CheckSessionCookieSameSiteMode;
+
+        /// <summary>
         /// The principal
         /// </summary>
         protected ClaimsPrincipal Principal;
@@ -238,7 +246,7 @@ namespace IdentityServer4.Services
                 Path = path,
                 IsEssential = true,
                 Domain = CheckSessionCookieDomain,
-                SameSite = SameSiteMode.None
+                SameSite = CheckSessionCookieSameSiteMode
             };
 
             return options;
@@ -273,8 +281,15 @@ namespace IdentityServer4.Services
             if (clientId == null) throw new ArgumentNullException(nameof(clientId));
 
             await AuthenticateAsync();
-            Properties?.AddClientId(clientId);
-            await UpdateSessionCookie();
+            if (Properties != null)
+            {
+                var clientIds = Properties.GetClientList();
+                if (!clientIds.Contains(clientId))
+                {
+                    Properties.AddClientId(clientId);
+                    await UpdateSessionCookie();
+                }
+            }
         }
 
         /// <summary>
@@ -285,16 +300,19 @@ namespace IdentityServer4.Services
         {
             await AuthenticateAsync();
 
-            try
+            if (Properties != null)
             {
-                return Properties.GetClientList();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "Error decoding client list");
-                // clear so we don't keep failing
-                Properties.RemoveClientList();
-                await UpdateSessionCookie();
+                try
+                {
+                    return Properties.GetClientList();
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "Error decoding client list");
+                    // clear so we don't keep failing
+                    Properties.RemoveClientList();
+                    await UpdateSessionCookie();
+                }
             }
 
             return Enumerable.Empty<string>();
